@@ -127,7 +127,7 @@ const Feed = (_earthquakes) => {
     ];
 
   	return (
-	    <section className='sec-reg'>
+	    <section className='sec-reg' id='section-feed'>
 	    	<Table columns={columns} dataSource={table_data} />
 	    </section>
   	);

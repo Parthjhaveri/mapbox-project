@@ -9,43 +9,30 @@ import Highlighter from 'react-highlight-words';
 import { Table, Input, Button } from 'antd';
 import { SearchOutlined } from '@ant-design/icons';
 
+// LIBRARIES
+import moment from 'moment';
+
 const Feed = (_earthquakes) => {
 
 	const [searchText, setSearchText] = useState('');
 	const [searchedColumn, setSearchColumn] = useState('');
-
-  	useEffect(() => {
-		if (_earthquakes._earthquakes != null) {
-			console.log(_earthquakes);
-		}
-	})
-
-	const data = [
-	  {
-	    key: '1',
-	    name: 'John Brown',
-	    age: 32,
-	    address: 'New York No. 1 Lake Park',
-	  },
-	  {
-	    key: '2',
-	    name: 'Joe Black',
-	    age: 42,
-	    address: 'London No. 1 Lake Park',
-	  },
-	  {
-	    key: '3',
-	    name: 'Jim Green',
-	    age: 32,
-	    address: 'Sidney No. 1 Lake Park',
-	  },
-	  {
-	    key: '4',
-	    name: 'Jim Red',
-	    age: 32,
-	    address: 'London No. 2 Lake Park',
-	  },
-	];
+	
+	// FEED TABLE DATA
+	const table_data = [];
+  	
+  	if (_earthquakes._earthquakes != null) {
+		_earthquakes._earthquakes.features.forEach((el, idx) => {
+			table_data.push(
+				{
+				    key: el.id,
+				    mag: el.properties.mag,
+				    time: moment(el.properties.time).format('MMMM Do YYYY, h:mm:ss a'),
+				    updated: moment(el.properties.updated).format('MMMM Do YYYY, h:mm:ss a'),
+				    title: el.properties.title
+			  	},
+			)
+		});			
+	}
 
 	const getColumnSearchProps = (dataIndex, searchInput) => ({
 
@@ -102,43 +89,46 @@ const Feed = (_earthquakes) => {
 
 	const handleSearch = (selectedKeys, confirm, dataIndex) => {
 		confirm();
-		// setState({
-		//   searchText: selectedKeys[0],
-		//   searchedColumn: dataIndex,
-		// });
 	};
 
 	const handleReset = clearFilters => {
 		clearFilters();
-		// setState({ searchText: '' });
 	};
 
+	// COLUMNS CONFIGURATION
 	const columns = [
-      {
-        title: 'Name',
-        dataIndex: 'name',
-        key: 'name',
-        width: '30%',
-        ...getColumnSearchProps('name'),
-      },
-      {
-        title: 'Age',
-        dataIndex: 'age',
-        key: 'age',
-        width: '20%',
-        ...getColumnSearchProps('age'),
-      },
-      {
-        title: 'Address',
-        dataIndex: 'address',
-        key: 'address',
-        ...getColumnSearchProps('address'),
-      },
+		{
+	        title: 'Title',
+	        dataIndex: 'title',
+	        key: 'title',
+	        width: '30%',
+	        ...getColumnSearchProps('title'),
+      	},
+      	{
+        	title: 'Magnitude',
+	        dataIndex: 'mag',
+	        key: 'mag',
+	        width: '10%',
+	        ...getColumnSearchProps('mag'),
+      	},
+      	{
+        	title: 'Time',
+        	dataIndex: 'time',
+        	key: 'time',
+        	width: '0%',
+        	...getColumnSearchProps('time'),
+      	},
+      	{
+	        title: 'Updated',
+        	dataIndex: 'updated',
+        	key: 'updated',
+        	...getColumnSearchProps('updated'),
+      	},      
     ];
-	 
+
   	return (
 	    <section className='sec-reg'>
-	    	<Table columns={columns} dataSource={data} />
+	    	<Table columns={columns} dataSource={table_data} />
 	    </section>
   	);
   

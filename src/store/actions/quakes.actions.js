@@ -6,6 +6,16 @@ import moment from 'moment';
 
 export const get_quakes = () => {
 	return (dispatch, getState) => {
-		// SOME LOGIC TO GET ALL TICKETS
+		// GET ALL EARTHQUAKES
+		fetch('https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_day.geojson')
+
+		.then(resp => resp.json())
+
+		.then((json) => {
+			dispatch({
+				data: json,
+				type: 'GET_ALL_QUAKES'
+			});
+		})
 	}
 }

@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from 'react';
+import {connect} from 'react-redux';
+import {get_quakes} from '../../store/actions/quakes.actions.js';
 
 // REACT HIGHLIGHTER
 import Highlighter from 'react-highlight-words';
@@ -7,13 +9,15 @@ import Highlighter from 'react-highlight-words';
 import { Table, Input, Button } from 'antd';
 import { SearchOutlined } from '@ant-design/icons';
 
-const Feed = () => {
+const Feed = (_earthquakes) => {
 
 	const [searchText, setSearchText] = useState('');
 	const [searchedColumn, setSearchColumn] = useState('');
 
   	useEffect(() => {
-	  	console.log('Feed!');
+		if (_earthquakes._earthquakes != null) {
+			console.log(_earthquakes);
+		}
 	})
 
 	const data = [
@@ -140,4 +144,16 @@ const Feed = () => {
   
 }
 
-export default Feed;
+const mapStateToProps = (state) => {		
+	return {		
+		_earthquakes: (state.earthquakes.quakes.length != 0 ? state.earthquakes.quakes : null)
+	}
+}
+
+const mapDispatchToProps = (dispatch) => {	
+	return {
+		all_earthquakes: dispatch(get_quakes())
+	}
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(Feed);

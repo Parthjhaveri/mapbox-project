@@ -181,13 +181,19 @@ section#section-map-wrapper {
 /* - - - - - - - - - - - - - - - - - */
 #section-feed {
     width: 50%;
+    height: 50vh;
+    border-right: 1px solid #000;
+    overflow-y: auto;
 }
 
 /* - - - - - - - - - - - - - - - - - */
 /* ANT DESIGN GLOBALS */
 /* - - - - - - - - - - - - - - - - - */
+table {
+    width: 100.1% !important;
+}
 td.ant-table-cell {
-    padding: 3px !important;
+    padding: 3px 10px !important;
     font-size: 9px !important;
     color: #000 !important;
     border: 1;
@@ -196,19 +202,24 @@ td.ant-table-cell {
 }
 th.ant-table-cell {
     padding: 10px !important;
-    background-color: #1a1a1a !important;
+    background-color: #f2f2f2 !important;
+    border-bottom: 1px solid #000 !important;
 }
 th.ant-table-cell * {
-    color: #fff !important;
+    color: #1a1a1a !important;
 }
 th .ant-table-filter-trigger-container span.ant-table-filter-trigger.ant-dropdown-trigger {
     border-right: 1px solid #666;
     color: #000;
+}
+#section-feed table th:nth-child(3) span.ant-table-filter-trigger-container span {
+    border-right: none;
 }
 tr th .ant-table-filter-column span.ant-table-filter-column-title {
     padding: 12px;
 }
 
 ul.ant-pagination.ant-table-pagination.ant-table-pagination-right {
-    margin-right: 15px;
+    position: relative;
+    margin: 10px auto;
 }

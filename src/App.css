@@ -179,14 +179,16 @@ section#section-map-wrapper {
 /* - - - - - - - - - - - - - - - - - */
 /* SECTION FEED */
 /* - - - - - - - - - - - - - - - - - */
-
+#section-feed {
+    width: 50%;
+}
 
 /* - - - - - - - - - - - - - - - - - */
 /* ANT DESIGN GLOBALS */
 /* - - - - - - - - - - - - - - - - - */
 td.ant-table-cell {
-    padding: 3px 10px !important;
-    font-size: 11px !important;
+    padding: 3px !important;
+    font-size: 9px !important;
     color: #000 !important;
     border: 1;
     cursor: pointer;

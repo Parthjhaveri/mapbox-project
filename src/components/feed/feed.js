@@ -27,7 +27,7 @@ const Feed = (_earthquakes) => {
 				    key: el.id,
 				    mag: el.properties.mag,
 				    time: moment(el.properties.time).format('MMMM Do YYYY, h:mm:ss a'),
-				    updated: moment(el.properties.updated).format('MMMM Do YYYY, h:mm:ss a'),
+				    updated: moment(el.properties.updated).startOf('hour').fromNow(),
 				    title: el.properties.title
 			  	},
 			)
@@ -101,11 +101,11 @@ const Feed = (_earthquakes) => {
 	        title: 'Title',
 	        dataIndex: 'title',
 	        key: 'title',
-	        width: '30%',
+	        width: '40%',
 	        ...getColumnSearchProps('title'),
       	},
       	{
-        	title: 'Magnitude',
+        	title: 'Mag.',
 	        dataIndex: 'mag',
 	        key: 'mag',
 	        width: '10%',
@@ -115,7 +115,7 @@ const Feed = (_earthquakes) => {
         	title: 'Time',
         	dataIndex: 'time',
         	key: 'time',
-        	width: '0%',
+        	width: '30%',
         	...getColumnSearchProps('time'),
       	},
       	{

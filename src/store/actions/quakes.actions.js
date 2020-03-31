@@ -4,19 +4,16 @@ import { QuakeReducerActions } from '../reducers/quakes.reducers.js';
 export const get_quakes = () => {
 	return (dispatch, getState) => {
 		// GET ALL EARTHQUAKES
-		setTimeout(() => {
+		fetch('https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_day.geojson')
 
-			// EVERY 1 MINUTE, EMIT A SOCKET EVENT
-			fetch('https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_day.geojson')
+		.then(resp => resp.json())
 
-			.then(resp => resp.json())
-
-			.then((json) => {
-				dispatch({
-					data: json,
-					type: 'GET_ALL_QUAKES'
-				});
-			})
-		}, 1000)
+		.then((json) => {
+			console.log('JSON ', json);
+			dispatch({
+				data: json,
+				type: 'GET_ALL_QUAKES'
+			});
+		})
 	}
 }

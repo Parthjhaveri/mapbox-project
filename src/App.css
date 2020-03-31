@@ -182,7 +182,7 @@ section#section-map-wrapper {
 #section-feed {
     width: 50%;
     height: 50vh;
-    border-right: 1px solid #000;
+    border-right: 1px solid #ddd;
     overflow-y: auto;
 }
 

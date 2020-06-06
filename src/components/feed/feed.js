@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { Component, useState, useEffect } from 'react';
 import {connect} from 'react-redux';
 import {get_quakes} from '../../store/actions/quakes.actions.js';
 
@@ -11,124 +11,162 @@ import { SearchOutlined } from '@ant-design/icons';
 
 // LIBRARIES
 import moment from 'moment';
+import socketIoClient from 'socket.io-client';
+import io from 'socket.io-client';
 
-const Feed = (_earthquakes) => {
+class Feed extends React.Component {
 
-	const [searchText, setSearchText] = useState('');
-	const [searchedColumn, setSearchColumn] = useState('');
-	
-	// FEED TABLE DATA
-	const table_data = [];
-  	
-  	if (_earthquakes._earthquakes != null) {
-		_earthquakes._earthquakes.features.forEach((el, idx) => {
-			table_data.push(
-				{
-				    key: el.id,
-				    mag: el.properties.mag,
-				    time: moment(el.properties.time).format('MMMM Do YYYY, h:mm:ss a').replace(/m/gi, 'M'),
-				    time_readable: moment(el.properties.time).startOf('hour').fromNow(),
-				    title: el.properties.title
-			  	},
-			)
-		});			
+	constructor(props) {
+		super(props);
+
+		this.state = {
+			searchText: '',
+			searchedColumn: '',
+			table_data: []
+		}
+		
+		// GET ALL EARTHQUAKES 
+	    this.socket = io('localhost:9000', {reconnection: true});
+
+	    this.getAllQuakes = this.getAllQuakes.bind(this);
+
 	}
 
-	const getColumnSearchProps = (dataIndex, searchInput) => ({
+	getAllQuakes() {
+		this.socket.on('all_quakes_event', (data) => {	    	
 
-	    filterDropdown: ({setSelectedKeys, selectedKeys, confirm, clearFilters }) => (
+		  	if (data) {	    
+		  		console.log(data);
+
+		    	const new_quake_data = data.features.map((el, idx) => {
+					return {
+					    key: el.id,
+					    mag: el.properties.mag,
+					    time: moment(el.properties.time).format('MMMM Do YYYY, h:mm:ss a'),
+					    time_readable: moment(el.properties.time).startOf('hour').fromNow(),
+					    title: el.properties.title
+				  	}
+				});	
+
+		    	this.setState({ table_data: [...this.state.table_data, ...new_quake_data] });
+
+			} // END IF	    	
+	    }); // END SOCKET EVENT
+
+	}
+
+	componentDidMount() {	
+		this.getAllQuakes();
+	}
+
+	componentWillUnmount() {
+	    this.socket.close();
+  	}
+
+	// - - - - - - - - - - - - - - - - - - - - - - - - -
+	getColumnSearchProps(dataIndex) {
+	    return {
+	    	filterDropdown: ({ setSelectedKeys, selectedKeys, confirm, clearFilters }) => (
 	      <div style={{ padding: 8 }}>
 	        <Input
 	          ref={node => {
-	            searchInput = node;
+	            this.searchInput = node;
 	          }}
 	          placeholder={`Search ${dataIndex}`}
 	          value={selectedKeys[0]}
 	          onChange={e => setSelectedKeys(e.target.value ? [e.target.value] : [])}
-	          onPressEnter={() => handleSearch(selectedKeys, confirm, dataIndex)}
+	          onPressEnter={() => this.handleSearch(selectedKeys, confirm, dataIndex)}
 	          style={{ width: 188, marginBottom: 8, display: 'block' }}
 	        />
 	        <Button
 	          type="primary"
-	          onClick={() => handleSearch(selectedKeys, confirm, dataIndex)}
+	          onClick={() => this.handleSearch(selectedKeys, confirm, dataIndex)}
 	          icon={<SearchOutlined />}
 	          size="small"
 	          style={{ width: 90, marginRight: 8 }}
 	        >
 	          Search
 	        </Button>
-	        <Button onClick={() => handleReset(clearFilters)} size="small" style={{ width: 90 }}>
+	        <Button onClick={() => this.handleReset(clearFilters)} size="small" style={{ width: 90 }}>
 	          Reset
 	        </Button>
 	      </div>
 	    ),
-	    
 	    filterIcon: filtered => <SearchOutlined style={{ color: filtered ? '#1890ff' : undefined }} />,
 	    onFilter: (value, record) =>
 	      record[dataIndex]
 	        .toString()
 	        .toLowerCase()
 	        .includes(value.toLowerCase()),
-	    onFilterDropdownVisibleChange: (visible) => {
+	    onFilterDropdownVisibleChange: visible => {
 	      if (visible) {
-	        setTimeout(() => searchInput.select());
+	        setTimeout(() => this.searchInput.select());
 	      }
 	    },
 	    render: text =>
-	      searchedColumn === dataIndex ? (
+	      this.state.searchedColumn === dataIndex ? (
 	        <Highlighter
 	          highlightStyle={{ backgroundColor: '#ffc069', padding: 0 }}
-	          searchWords={[searchText]}
+	          searchWords={[this.state.searchText]}
 	          autoEscape
 	          textToHighlight={text.toString()}
 	        />
 	      ) : (
 	        text
 	      ),
-  	});
+	    }
+  	};
 
-	const handleSearch = (selectedKeys, confirm, dataIndex) => {
-		confirm();
-	};
+  	handleSearch(selectedKeys, confirm, dataIndex) {
+    	confirm();
+    	this.setState({
+      		searchText: selectedKeys[0],
+      		searchedColumn: dataIndex,
+    	});
+  	};
 
-	const handleReset = clearFilters => {
-		clearFilters();
-	};
+	handleReset(clearFilters) {
+	    clearFilters();
+	    this.setState({ searchText: '' });
+	 };
+	// - - - - - - - - - - - - - - - - - - - - - - - - -
 
-	// COLUMNS CONFIGURATION
-	const columns = [
-		{
-	        title: 'Title',
-	        dataIndex: 'title',
-	        key: 'title',
-	        width: '40%',
-	        ...getColumnSearchProps('title'),
-      	},
-      	{
-        	title: 'Mag.',
-	        dataIndex: 'mag',
-	        key: 'mag',
-	        width: '10%',
-	        ...getColumnSearchProps('mag'),
-      	},
-      	{
-        	title: 'Time',
-        	dataIndex: 'time',
-        	key: 'time',
-        	...getColumnSearchProps('time'),
-      	},  
-      	{
-        	title: '',
-        	dataIndex: 'time_readable',
-        	key: 'time_readable',        	
-      	},     
-    ];
+	render() {
+		// COLUMNS CONFIGURATION
+		this.columns = [
+			{
+		        title: 'Title',
+		        dataIndex: 'title',
+		        key: 'title',
+		        width: '40%',
+		        ...this.getColumnSearchProps('title'),
+	      	},
+	      	{
+	        	title: 'Mag.',
+		        dataIndex: 'mag',
+		        key: 'mag',
+		        width: '10%',
+		        ...this.getColumnSearchProps('mag'),
+	      	},
+	      	{
+	        	title: 'Time',
+	        	dataIndex: 'time',
+	        	key: 'time',
+	        	...this.getColumnSearchProps('time'),
+	      	},  
+	      	{
+	        	title: '',
+	        	dataIndex: 'time_readable',
+	        	key: 'time_readable',        	
+	      	},     
+	    ];
 
-  	return (
-	    <section className='sec-reg' id='section-feed'>
-	    	<Table columns={columns} dataSource={table_data} />
-	    </section>
-  	);
+	  	return (
+		    <section className='sec-reg' id='section-feed'>
+		    	<Table columns={this.columns} dataSource={this.state.table_data} />
+		    </section>
+	  	);
+	}
   
 }
 
